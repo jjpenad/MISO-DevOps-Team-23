@@ -1,0 +1,402 @@
+{
+	"info": {
+		"_postman_id": "465d527b-4f36-4cfd-81ea-055c5b8f111d",
+		"name": "MISO DevOps Blacklist Service",
+		"description": "This Postman collection allows you to interact with the **Global Email Blacklist Microservice**. The service exposes two main endpoints:\n\n- **POST** **`/blacklists`**: Add an email to the blacklist.\n    \n- **GET** **`/blacklists/`**: Check if an email is blacklisted\n    \n- POST **`/login`**: Generates a jwt token and set the environment variable to use it in other requests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "10706350"
+	},
+	"item": [
+		{
+			"name": "Get Access Token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Content-Type header is application/json\", function () {\r",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Access token is present in the response\", function () {\r",
+							"  const responseData = pm.response.json();\r",
+							"  pm.expect(responseData.access_token).to.exist;\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Validate the schema of the response JSON\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.access_token).to.exist.and.to.be.a('string');\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response time is less than 200ms\", function () {\r",
+							"  pm.expect(pm.response.responseTime).to.be.below(200);\r",
+							"});\r",
+							"// Extract the access_token from the response body and store it in an environment variable\r",
+							"pm.test(\"Extract and store access_token in an environment variable\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    pm.environment.set(\"access_token\", responseData.access_token);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/login",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"login"
+					]
+				},
+				"description": "Generates a JWT Bearer Token to be used in requests that require authorization. This automatically sets a **`access_token`** environment variable that is used in the other requests."
+			},
+			"response": [
+				{
+					"name": "Successful response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"login"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "Werkzeug/3.0.4 Python/3.12.5"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 19 Oct 2024 14:46:47 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "354"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcyOTM0OTIwNywianRpIjoiMWVjMjhhNzYtZjk3Ny00MDc5LWEyODgtNDc3MmJkNzhmZjkwIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6InVzZXIiLCJuYmYiOjE3MjkzNDkyMDcsImNzcmYiOiIyM2QxYTIyMy0zYTI3LTRlOWUtOWRjYS0xNDU3MmIwNTQ3ZjEiLCJleHAiOjE3MjkzNTAxMDd9.lyZwKV1eQm9EXzZg65zrPm-qk46Acfya_W61ylNHYJY\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Add to BlackList",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\":\"juanpd.26@gmail.com\",\r\n    \"app_uuid\":\"32423\",\r\n    \"blocked_reason\":\"wdfvwerf\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/blacklists",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"blacklists"
+					]
+				},
+				"description": "Allows to add an email to the blacklist. If the email was already added, then it return a 400 response."
+			},
+			"response": [
+				{
+					"name": "201 Added to Blacklist",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"juanpd.26@gmail.com\",\r\n    \"app_uuid\":\"32423\",\r\n    \"blocked_reason\":\"wdfvwerf\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/blacklists",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"blacklists"
+							]
+						}
+					},
+					"status": "CREATED",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "Werkzeug/3.0.4 Python/3.12.5"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 19 Oct 2024 14:47:42 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "60"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"message\": \"Email added to blacklist successfully.\"\n}"
+				},
+				{
+					"name": "400 Already blacklisted",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"juanpd.26@gmail.com\",\r\n    \"app_uuid\":\"32423\",\r\n    \"blocked_reason\":\"wdfvwerf\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/blacklists",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"blacklists"
+							]
+						}
+					},
+					"status": "BAD REQUEST",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "Werkzeug/3.0.4 Python/3.12.5"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 19 Oct 2024 14:48:08 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "48"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"message\": \"Email already blacklisted.\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Get From Blacklist By Email",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/blacklists/:email",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"blacklists",
+						":email"
+					],
+					"variable": [
+						{
+							"key": "email",
+							"value": "juanpd.26@gmail.com"
+						}
+					]
+				},
+				"description": "Allows to know if an email was already added to the global blacklist and the reason of this."
+			},
+			"response": [
+				{
+					"name": "200 Get By Existing Email",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/blacklists/:email",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"blacklists",
+								":email"
+							],
+							"variable": [
+								{
+									"key": "email",
+									"value": "juanpd.26@gmail.com"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "Werkzeug/3.0.4 Python/3.12.5"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 19 Oct 2024 14:56:42 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "224"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"blacklisted\": true,\n    \"data\": {\n        \"id\": 1,\n        \"email\": \"juanpd.26@gmail.com\",\n        \"app_uuid\": \"32423\",\n        \"blocked_reason\": \"wdfvwerf\",\n        \"created_at\": \"2024-10-19T14:47:42.985436\"\n    }\n}"
+				},
+				{
+					"name": "404 Get By Non existing email",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/blacklists/:email",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"blacklists",
+								":email"
+							],
+							"variable": [
+								{
+									"key": "email",
+									"value": "anpd.26@gmail.com"
+								}
+							]
+						}
+					},
+					"status": "NOT FOUND",
+					"code": 404,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "Werkzeug/3.0.4 Python/3.12.5"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 19 Oct 2024 14:57:21 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "29"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"blacklisted\": false\n}"
+				}
+			]
+		}
+	]
+}

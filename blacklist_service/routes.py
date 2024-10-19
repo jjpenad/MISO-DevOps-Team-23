@@ -28,6 +28,17 @@ class AddToBlacklist(Resource):
         return {"message": "Email added to blacklist successfully."}, 201
 
 
+class CheckBlacklist(Resource):
+    @jwt_required()
+    def get(self, email):
+        blacklist_entry = Blacklist.query.filter_by(email=email).first()
+        if not blacklist_entry:
+            return {"blacklisted": False}, 404
+
+        result = blacklist_schema.dump(blacklist_entry)
+        return {"blacklisted": True, "data": result}, 200
+
+
 class Login(Resource):
     def post(self):
         # Este token puede ser estático para propósitos de prueba
