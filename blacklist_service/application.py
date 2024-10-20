@@ -5,10 +5,10 @@ from extensions import db, ma, jwt
 from routes import AddToBlacklist, CheckBlacklist, Login
 
 
-app = Flask(__name__)
+application = Flask(__name__)
 
 
-def create_app():
+def create_app(app):
 
     app.config.from_object(Config)
 
@@ -32,5 +32,5 @@ def create_app():
 
 
 if __name__ == '__main__':
-    app = create_app()
-    app.run(debug=True)
+    application = create_app(application)
+    application.run(debug=True)
