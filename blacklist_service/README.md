@@ -18,7 +18,7 @@ The application is built using Python 3.10 and Flask, with several extensions to
 ```bash
 blacklist_service/
 │
-├── app.py                  # Main entry point for the Flask app
+├── application.py          # Main entry point for the Flask app
 ├── config.py               # Configuration for the app (Database URI, JWT secret, etc.)
 ├── models.py               # SQLAlchemy models (defines the Blacklist table)
 ├── schemas.py              # Marshmallow schemas for serializing and deserializing data
@@ -92,6 +92,6 @@ Inside the [`collections`](./collections/) folder in the project root, you will 
 
 6. **Run the app**:
    ```bash
-   python app.py
+   python application.py
    ```
    The service will be available at `http://127.0.0.1:5000`.
