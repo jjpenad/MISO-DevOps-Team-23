@@ -5,8 +5,11 @@ from extensions import db, ma, jwt
 from routes import AddToBlacklist, CheckBlacklist, Login
 
 
+app = Flask(__name__)
+
+
 def create_app():
-    app = Flask(__name__)
+
     app.config.from_object(Config)
 
     # Inicializar extensiones
